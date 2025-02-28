@@ -1,3 +1,3 @@
-module hotels/api
+module example.com/hello
 
 go 1.24.0

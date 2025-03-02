@@ -14,16 +14,30 @@ const (
 
 type Dictionary map[string]string
 
-func (d Dictionary) Update(word string, newDefinition string) error {
-	_, err := d.Search(word)
-	switch err {
+func (d Dictionary) checkWordDoesNotExists(word string) error {
+	switch _, err := d.Search(word); err {
 	case ErrNotFound:
 		return ErrWordDoesNotExist
 	case nil:
-		d[word] = newDefinition
+		return nil
 	default:
 		return err
 	}
+}
+
+func (d Dictionary) Delete(word string) error {
+	if err := d.checkWordDoesNotExists(word); err != nil {
+		return err
+	}
+	delete(d, word)
+	return nil
+}
+
+func (d Dictionary) Update(word string, newDefinition string) error {
+	if err := d.checkWordDoesNotExists(word); err != nil {
+		return err
+	}
+	d[word] = newDefinition
 	return nil
 }
 

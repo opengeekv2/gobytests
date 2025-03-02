@@ -14,11 +14,12 @@ const (
 
 type Dictionary map[string]string
 
-func (d Dictionary) checkWordDoesNotExists(word string) error {
+func (d Dictionary) checkWordDoesNotExistsAndDo(word string, do func()) error {
 	switch _, err := d.Search(word); err {
 	case ErrNotFound:
 		return ErrWordDoesNotExist
 	case nil:
+		do()
 		return nil
 	default:
 		return err
@@ -26,19 +27,15 @@ func (d Dictionary) checkWordDoesNotExists(word string) error {
 }
 
 func (d Dictionary) Delete(word string) error {
-	if err := d.checkWordDoesNotExists(word); err != nil {
-		return err
-	}
-	delete(d, word)
-	return nil
+	return d.checkWordDoesNotExistsAndDo(word, func() {
+		delete(d, word)
+	})
 }
 
 func (d Dictionary) Update(word string, newDefinition string) error {
-	if err := d.checkWordDoesNotExists(word); err != nil {
-		return err
-	}
-	d[word] = newDefinition
-	return nil
+	return d.checkWordDoesNotExistsAndDo(word, func() {
+		d[word] = newDefinition
+	})
 }
 
 func (d Dictionary) Add(word string, definition string) error {

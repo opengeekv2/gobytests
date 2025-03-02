@@ -30,9 +30,10 @@ func TestAdd(t *testing.T) {
 		dictionary := Dictionary{}
 		word := "test"
 		definition := "this is just a test"
-		dictionary.Add(word, definition)
+		err := dictionary.Add(word, definition)
 
 		want := "this is just a test"
+		assertNoError(t, err)
 		assertDefinition(t, dictionary, want)
 	})
 
@@ -54,8 +55,9 @@ func TestUpdate(t *testing.T) {
 		dictionary := Dictionary{word: definition}
 		newDefinition := "new definition"
 
-		dictionary.Update(word, newDefinition)
+		err := dictionary.Update(word, newDefinition)
 
+		assertNoError(t, err)
 		assertDefinition(t, dictionary, newDefinition)
 	})
 
@@ -75,7 +77,8 @@ func TestDelete(t *testing.T) {
 		dictionary := Dictionary{"test": "this is just a test"}
 		word := "test"
 
-		dictionary.Delete(word)
+		delErr := dictionary.Delete(word)
+		assertNoError(t, delErr)
 
 		_, err := dictionary.Search(word)
 		assertError(t, err, ErrNotFound)
@@ -115,5 +118,12 @@ func assertError(t testing.TB, got, want error) {
 
 	if got != want {
 		t.Errorf("got error '%s' want '%s'", got, want)
+	}
+}
+
+func assertNoError(t testing.TB, got error) {
+	t.Helper()
+	if got != nil {
+		t.Fatal("got an error but didn't want one")
 	}
 }
